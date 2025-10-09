@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M.N.Academy Vocational Result</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- jsPDF for PDF Generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom Styles -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+        /* Page transition animation */
+        .page {
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* Custom modal animation */
+        .modal-content {
+            animation: zoomIn 0.3s ease-out;
+        }
+        @keyframes zoomIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        /* Print-specific styles */
+        @media print {
+            body {
+                background: white;
+            }
+            body * {
+                visibility: hidden;
+            }
+            #print-area, #print-area * {
+                visibility: visible;
+            }
+            #print-area {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                padding: 15mm;
+            }
+            .no-print {
+                display: none !important;
+            }
+            @page {
+                size: A4;
+                margin: 15mm;
+            }
+        }
+        /* Custom glass effect */
+        .glass {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+        /* Custom button styles */
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        .btn-secondary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            transition: all 0.3s ease;
+        }
+        .btn-secondary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        .btn-success {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            transition: all 0.3s ease;
+        }
+        .btn-success:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        /* Card hover effect */
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+        /* Input field styling */
+        .input-field {
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+        .input-field:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        /* Table styling */
+        .table-row {
+            transition: all 0.2s ease;
+        }
+        .table-row:hover {
+            background-color: #f8fafc;
+        }
+        /* Confetti animation */
+        @keyframes confetti-fall {
+            0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+        }
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 20px;
+            background-color: #f00;
+            animation: confetti-fall 3s linear forwards;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body class="antialiased text-gray-800">
+    <!-- Navigation Bar -->
+    <nav class="bg-white shadow-lg sticky top-0 z-40">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center space-x-2">
+                    <div class="bg-gradient-to-r from-purple-500 to-indigo-600 text-white p-2 rounded-lg">
+                        <i class="fas fa-graduation-cap text-xl"></i>
+                    </div>
+                    <h1 class="text-xl font-bold text-gray-800">M.N.Academy Vocational Result</h1>
+                </div>
+                <div class="flex space-x-4">
+                    <button onclick="showPage('search-result-page')" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg transition flex items-center space-x-2">
+                        <i class="fas fa-search"></i>
+                        <span>Search Result</span>
+                    </button>
+                    <button onclick="showPasswordModal('input-result-page')" class="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg transition flex items-center space-x-2">
+                        <i class="fas fa-plus-circle"></i>
+                        <span>Input Result</span>
+                    </button>
+                    <button onclick="showPasswordModal('all-results-page')" class="bg-purple-500 hover:bg-purple-600 text-white font-semibold py-2 px-4 rounded-lg transition flex items-center space-x-2">
+                        <i class="fas fa-list-alt"></i>
+                        <span>All Records</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <div id="app-container" class="container mx-auto p-4 md:p-8 max-w-7xl">
+        <!-- Home Page -->
+        <div id="home-page" class="page">
+            <header class="text-center my-12">
+                <div class="inline-block p-2 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full mb-6">
+                    <i class="fas fa-graduation-cap text-white text-4xl"></i>
+                </div>
+                <h1 class="text-5xl md:text-6xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">M.N.Academy</h1>
+                <p class="text-2xl text-gray-700 mb-2">Vocational Result Management System</p>
+                <p class="text-gray-600">SSC Vocational Board</p>
+            </header>
+            <main class="max-w-4xl mx-auto">
+                <div class="bg-white p-12 rounded-2xl shadow-2xl card-hover text-center">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-6">Search for Student Result</h2>
+                    <p class="text-gray-600 mb-8">Enter student details to view their examination results</p>
+                    <div class="max-w-md mx-auto space-y-6">
+                        <div>
+                            <label for="home-search-class" class="block text-sm font-medium text-gray-700 text-left mb-2">Class</label>
+                            <select id="home-search-class" class="w-full py-3 px-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                <option value="9">Class 9</option>
+                                <option value="10">Class 10</option>
+                            </select>
+                        </div>
+                        <div>
+                             <label for="home-search-id" class="block text-sm font-medium text-gray-700 text-left mb-2">Student ID</label>
+                             <input type="text" id="home-search-id" class="w-full py-3 px-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Enter Student ID">
+                        </div>
+                        <button onclick="searchResultFromHome()" class="w-full btn-primary text-white font-bold py-3 px-4 rounded-lg transition flex items-center justify-center space-x-2">
+                            <i class="fas fa-search"></i>
+                            <span>Search Result</span>
+                        </button>
+                    </div>
+                </div>
+            </main>
+            <div id="home-result-display-area" class="mt-8"></div>
+        </div>
+        <!-- Input Result Page -->
+        <div id="input-result-page" class="page">
+            <header class="mb-8 flex justify-between items-center">
+                <h1 class="text-3xl font-bold text-gray-800">Input Student Result</h1>
+                <button onclick="goHome()" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded-lg transition flex items-center space-x-2">
+                    <i class="fas fa-home"></i>
+                    <span>Home</span>
+                </button>
+            </header>
+            <div id="class-selection-input" class="text-center">
+                <h2 class="text-2xl mb-6 text-gray-700">Select Class to Input Result</h2>
+                <button onclick="setupInputForm(9)" class="btn-primary text-white font-bold py-4 px-8 rounded-lg transition mr-4">
+                    <i class="fas fa-user-graduate mr-2"></i>Class 9
+                </button>
+                <button onclick="setupInputForm(10)" class="btn-success text-white font-bold py-4 px-8 rounded-lg transition">
+                    <i class="fas fa-user-graduate mr-2"></i>Class 10
+                </button>
+            </div>
+            <div id="input-form-container" class="hidden mt-8 bg-white p-8 rounded-2xl shadow-xl">
+                <!-- Form content will be dynamically generated here -->
+            </div>
+        </div>
+        
+        <!-- Search Result Page -->
+        <div id="search-result-page" class="page">
+            <header class="mb-8 flex justify-between items-center">
+                <h1 class="text-3xl font-bold text-gray-800">Search for Result</h1>
+                <button onclick="goHome()" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded-lg transition flex items-center space-x-2">
+                    <i class="fas fa-home"></i>
+                    <span>Home</span>
+                </button>
+            </header>
+            <div class="bg-white p-8 rounded-2xl shadow-xl max-w-md mx-auto">
+                <div class="space-y-6">
+                    <div>
+                        <label for="search-class" class="block text-sm font-medium text-gray-700 mb-2">Class</label>
+                        <select id="search-class" class="w-full py-3 px-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <option value="9">Class 9</option>
+                            <option value="10">Class 10</option>
+                        </select>
+                    </div>
+                    <div>
+                         <label for="search-id" class="block text-sm font-medium text-gray-700 mb-2">Student ID</label>
+                         <input type="text" id="search-id" class="w-full py-3 px-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Enter Student ID">
+                    </div>
+                    <button onclick="searchResult()" class="w-full btn-primary text-white font-bold py-3 px-4 rounded-lg transition flex items-center justify-center space-x-2">
+                        <i class="fas fa-search"></i>
+                        <span>Search</span>
+                    </button>
+                </div>
+            </div>
+            <div id="result-display-area" class="mt-8"></div>
+        </div>
+        <!-- All Results Page -->
+        <div id="all-results-page" class="page">
+             <header class="mb-8 flex justify-between items-center no-print">
+                <h1 class="text-3xl font-bold text-gray-800">All Student Records</h1>
+                <button onclick="goHome()" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded-lg transition flex items-center space-x-2">
+                    <i class="fas fa-home"></i>
+                    <span>Home</span>
+                </button>
+            </header>
+             <div id="class-selection-all" class="text-center no-print">
+                <h2 class="text-2xl mb-6 text-gray-700">Select Class to View Records</h2>
+                <button onclick="fetchAllResults(9)" class="btn-primary text-white font-bold py-4 px-8 rounded-lg transition mr-4">
+                    <i class="fas fa-user-graduate mr-2"></i>Class 9
+                </button>
+                <button onclick="fetchAllResults(10)" class="btn-success text-white font-bold py-4 px-8 rounded-lg transition">
+                    <i class="fas fa-user-graduate mr-2"></i>Class 10
+                </button>
+            </div>
+            <div id="all-results-container" class="mt-8 bg-white p-8 rounded-2xl shadow-xl">
+                <!-- All results table will be injected here -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <footer class="text-center py-6 mt-12">
+        <p class="text-sm text-gray-600">Developed by <span class="font-semibold text-gray-800">BAPPI</span></p>
+        <p class="text-xs text-gray-500 mt-1">M.N.Academy Result Management System © 2025</p>
+    </footer>
+    
+    <!-- Modals -->
+    <div id="password-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center hidden z-50">
+        <div class="modal-content bg-white p-8 rounded-2xl shadow-2xl w-full max-w-sm">
+            <div class="text-center mb-6">
+                <div class="inline-block p-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full mb-4">
+                    <i class="fas fa-lock text-white text-xl"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-800">Admin Access Required</h3>
+            </div>
+            <p id="password-error" class="text-red-500 text-center mb-4 hidden">Incorrect Password. Please try again.</p>
+            <input type="password" id="password-input" class="w-full py-3 px-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Enter Password">
+            <div class="mt-6 flex justify-end space-x-4">
+                <button onclick="hidePasswordModal()" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition">Cancel</button>
+                <button onclick="checkPassword()" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">Submit</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="congrats-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center hidden z-50">
+        <div class="modal-content text-center bg-white p-12 rounded-2xl shadow-2xl max-w-md">
+            <div class="mb-6">
+                <div class="inline-block p-4 bg-gradient-to-r from-green-400 to-blue-500 rounded-full mb-4">
+                    <i class="fas fa-trophy text-white text-4xl"></i>
+                </div>
+                <h2 class="text-3xl font-bold text-green-500">Congratulations!</h2>
+            </div>
+            <p id="congrats-details" class="text-lg text-gray-700 mb-4"></p>
+            <div class="mt-6 flex justify-center">
+                <div class="w-16 h-1 bg-gradient-to-r from-green-400 to-blue-500 rounded-full"></div>
+            </div>
+        </div>
+    </div>
+    <div id="not-found-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center hidden z-50">
+         <div class="modal-content text-center bg-white p-8 rounded-2xl shadow-2xl max-w-sm">
+            <div class="mb-4">
+                <div class="inline-block p-3 bg-gradient-to-r from-red-400 to-red-600 rounded-full">
+                    <i class="fas fa-exclamation-triangle text-white text-xl"></i>
+                </div>
+            </div>
+            <h2 class="text-2xl font-bold text-red-500 mb-2">No Result Found</h2>
+            <p class="text-gray-600">Please check the Class and Student ID and try again.</p>
+            <button onclick="closeModal('not-found-modal')" class="mt-6 px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">OK</button>
+        </div>
+    </div>
+    
+    <!-- This div is used for printing content -->
+    <div id="print-area"></div>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script>
+        // --- FIREBASE CONFIGURATION ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyBrKvlkkovmLlQxSdPZJEZZdA_yFxKwka8",
+            authDomain: "result-7521b.firebaseapp.com",
+            projectId: "result-7521b",
+            storageBucket: "result-7521b.firebasestorage.app",
+            messagingSenderId: "156070024637",
+            appId: "1:156070024637:web:42da8f7dfaadb184b26ed4"
+        };
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const resultsCollection = db.collection("results");
+        // --- GLOBAL STATE ---
+        let currentPage = 'home-page';
+        let targetPage = '';
+        const STATIC_PASSWORD = 'mna';
+        
+        // --- SUBJECTS & GRADING DATA ---
+        const subjects = {
+            9: [
+                { name: "Bangla -1", total: 100, cq: 60, ca: 40, p: 0 },
+                { name: "English-1", total: 100, cq: 60, ca: 40, p: 0 },
+                { name: "Math -1", total: 100, cq: 60, ca: 40, p: 0 },
+                { name: "Bangladesh and global studies -1", total: 50, cq: 30, ca: 20, p: 0 },
+                { name: "Physics -1", total: 75, cq: 30, ca: 20, p: 25 },
+                { name: "Chemistry -1", total: 75, cq: 30, ca: 20, p: 25 },
+                { name: "Engineering Drawing", total: 50, cq: 0, ca: 0, p: 50 },
+                { name: "ICT/Computer Application -1", total: 50, cq: 0, ca: 0, p: 50 },
+                { name: "Religion & Moral Ed. -1", total: 100, cq: 60, ca: 40, p: 0 },
+                { name: "Trade -1", total: 200, cq: 60, ca: 40, p: 100 },
+                { name: "Trade -2", total: 200, cq: 60, ca: 40, p: 100 },
+                { name: "Real Training", total: 50, cq: 0, ca: 0, p: 50 },
+                { name: "Optional subject", total: 100, cq: 45, ca: 30, p: 25, optional: true },
+            ],
+            10: [
+                { name: "Bangla -2", total: 100, cq: 60, ca: 40, p: 0 },
+                { name: "English-2", total: 100, cq: 60, ca: 40, p: 0 },
+                { name: "Math -2", total: 100, cq: 60, ca: 40, p: 0 },
+                { name: "Bangladesh and global studies -2", total: 50, cq: 30, ca: 20, p: 0 },
+                { name: "Physics -2", total: 75, cq: 30, ca: 20, p: 25 },
+                { name: "Chemistry -2", total: 75, cq: 30, ca: 20, p: 25 },
+                { name: "Self-employment", total: 50, cq: 0, ca: 0, p: 50 },
+                { name: "ICT/Computer Application -2", total: 50, cq: 0, ca: 0, p: 50 },
+                { name: "Religion & Moral Ed. -2", total: 100, cq: 60, ca: 40, p: 0 },
+                { name: "Trade -1", total: 200, cq: 60, ca: 40, p: 100 },
+                { name: "Trade -2", total: 200, cq: 60, ca: 40, p: 100 },
+                { name: "Real Training", total: 50, cq: 0, ca: 0, p: 50 },
+                { name: "Optional subject", total: 100, cq: 45, ca: 30, p: 25, optional: true },
+            ]
+        };
+        function getGradeInfo(percentage) {
+            if (percentage >= 80) return { grade: 'A+', gp: 5.00, remarks: 'Outstanding' };
+            if (percentage >= 70) return { grade: 'A', gp: 4.00, remarks: 'Excellent' };
+            if (percentage >= 60) return { grade: 'A-', gp: 3.50, remarks: 'Very Good' };
+            if (percentage >= 50) return { grade: 'B', gp: 3.00, remarks: 'Good' };
+            if (percentage >= 40) return { grade: 'C', gp: 2.00, remarks: 'Satisfactory' };
+            if (percentage >= 33) return { grade: 'D', gp: 1.00, remarks: 'Pass' };
+            return { grade: 'F', gp: 0.00, remarks: 'Fail' };
+        }
+        // --- PAGE NAVIGATION ---
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => {
+                page.style.display = 'none';
+            });
+            const newPage = document.getElementById(pageId);
+            if (newPage) {
+                newPage.style.display = 'block';
+                currentPage = pageId;
+            }
+        }
+        
+        function goHome() {
+            showPage('home-page');
+            // Reset state
+            document.getElementById('input-form-container').innerHTML = '';
+            document.getElementById('input-form-container').classList.add('hidden');
+            document.getElementById('class-selection-input').classList.remove('hidden');
+            document.getElementById('result-display-area').innerHTML = '';
+            document.getElementById('home-result-display-area').innerHTML = '';
+            document.getElementById('all-results-container').innerHTML = '';
+            document.getElementById('class-selection-all').classList.remove('hidden');
+        }
+        // --- PASSWORD MODAL LOGIC ---
+        function showPasswordModal(destination) {
+            targetPage = destination;
+            document.getElementById('password-modal').classList.remove('hidden');
+            document.getElementById('password-input').focus();
+        }
+        function hidePasswordModal() {
+            document.getElementById('password-modal').classList.add('hidden');
+            document.getElementById('password-input').value = '';
+            document.getElementById('password-error').classList.add('hidden');
+        }
+        function checkPassword() {
+            const input = document.getElementById('password-input').value;
+            if (input === STATIC_PASSWORD) {
+                hidePasswordModal();
+                showPage(targetPage);
+            } else {
+                document.getElementById('password-error').classList.remove('hidden');
+            }
+        }
+        // --- INPUT FORM LOGIC ---
+        function setupInputForm(classNumber, studentData = null) {
+            document.getElementById('class-selection-input').classList.add('hidden');
+            const container = document.getElementById('input-form-container');
+            container.classList.remove('hidden');
+            
+            const classSubjects = subjects[classNumber];
+            let formHTML = `
+                <h2 class="text-2xl font-bold mb-6 text-gray-800">Enter Marks for Class ${classNumber}</h2>
+                <div class="grid md:grid-cols-3 gap-6 mb-8">
+                    <div>
+                        <label for="student-name" class="block text-sm font-medium text-gray-700 mb-2">Student Name</label>
+                        <input type="text" id="student-name" class="w-full py-3 px-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" value="${studentData ? studentData.name : ''}" placeholder="Enter student name">
+                    </div>
+                    <div>
+                        <label for="student-id" class="block text-sm font-medium text-gray-700 mb-2">Student ID</label>
+                        <input type="text" id="student-id" class="w-full py-3 px-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" value="${studentData ? studentData.id : ''}" ${studentData ? 'readonly' : ''} placeholder="Enter student ID">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Class</label>
+                        <input type="text" id="student-class" class="w-full py-3 px-4 border border-gray-300 rounded-lg shadow-sm bg-gray-100" value="${classNumber}" readonly>
+                    </div>
+                </div>
+                <div class="overflow-x-auto rounded-lg border border-gray-200">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gradient-to-r from-blue-500 to-purple-600 text-white">
+                            <tr>
+                                <th class="px-6 py-4 text-left text-sm font-medium uppercase">SL</th>
+                                <th class="px-6 py-4 text-left text-sm font-medium uppercase">Subject</th>
+                                <th class="px-6 py-4 text-left text-sm font-medium uppercase">CQ</th>
+                                <th class="px-6 py-4 text-left text-sm font-medium uppercase">CA</th>
+                                <th class="px-6 py-4 text-left text-sm font-medium uppercase">Practical</th>
+                                <th class="px-6 py-4 text-left text-sm font-medium uppercase">Total</th>
+                                <th class="px-6 py-4 text-left text-sm font-medium uppercase">Grade</th>
+                            </tr>
+                        </thead>
+                        <tbody id="marks-table-body" class="bg-white divide-y divide-gray-200">
+                            ${classSubjects.map((sub, i) => `
+                                <tr data-subject-index="${i}" class="table-row">
+                                    <td class="px-6 py-4 whitespace-nowrap text-center">${i + 1}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">${sub.name} (${sub.total})</td>
+                                    <td class="px-6 py-4"><input type="number" oninput="updateRow(${i})" class="w-20 py-2 px-3 border border-gray-300 rounded-md shadow-sm mark-input focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500" data-type="cq" data-max="${sub.cq}" ${sub.cq === 0 ? 'disabled' : ''} value="${studentData && studentData.marks[i] ? studentData.marks[i].cq : ''}" placeholder="0"></td>
+                                    <td class="px-6 py-4"><input type="number" oninput="updateRow(${i})" class="w-20 py-2 px-3 border border-gray-300 rounded-md shadow-sm mark-input focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500" data-type="ca" data-max="${sub.ca}" ${sub.ca === 0 ? 'disabled' : ''} value="${studentData && studentData.marks[i] ? studentData.marks[i].ca : ''}" placeholder="0"></td>
+                                    <td class="px-6 py-4"><input type="number" oninput="updateRow(${i})" class="w-20 py-2 px-3 border border-gray-300 rounded-md shadow-sm mark-input focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500" data-type="p" data-max="${sub.p}" ${sub.p === 0 ? 'disabled' : ''} value="${studentData && studentData.marks[i] ? studentData.marks[i].p : ''}" placeholder="0"></td>
+                                    <td class="px-6 py-4 font-bold total-mark text-center">-</td>
+                                    <td class="px-6 py-4 font-semibold grade text-center">-</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="mt-8 flex justify-end space-x-4">
+                     <button onclick="goHome()" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg transition flex items-center space-x-2">
+                        <i class="fas fa-home"></i>
+                        <span>Go to Home</span>
+                    </button>
+                    <button onclick="clearForm(${classNumber})" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-lg transition flex items-center space-x-2">
+                        <i class="fas fa-redo"></i>
+                        <span>Input Another</span>
+                    </button>
+                    <button onclick="saveResult(${classNumber})" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg transition flex items-center space-x-2">
+                        <i class="fas fa-save"></i>
+                        <span>${studentData ? 'Update Result' : 'Save Result'}</span>
+                    </button>
+                </div>
+            `;
+            container.innerHTML = formHTML;
+            if(studentData) {
+                classSubjects.forEach((_, i) => updateRow(i));
+            }
+        }
+        function updateRow(index) {
+            const row = document.querySelector(`tr[data-subject-index="${index}"]`);
+            const classNumber = document.getElementById('student-class').value;
+            const subjectInfo = subjects[classNumber][index];
+            const cqInput = row.querySelector('[data-type="cq"]');
+            const caInput = row.querySelector('[data-type="ca"]');
+            const pInput = row.querySelector('[data-type="p"]');
+            
+            [cqInput, caInput, pInput].forEach(input => {
+                if (input) {
+                    const max = parseInt(input.dataset.max);
+                    if (parseInt(input.value) > max) {
+                        input.value = max;
+                    }
+                     if (parseInt(input.value) < 0) {
+                        input.value = 0;
+                    }
+                }
+            });
+            const cq = parseInt(cqInput.value) || 0;
+            const ca = parseInt(caInput.value) || 0;
+            const p = parseInt(pInput.value) || 0;
+            const total = cq + ca + p;
+            row.querySelector('.total-mark').textContent = total;
+            let failed = false;
+            if (total < subjectInfo.total * 0.33) failed = true;
+            if (subjectInfo.cq > 0 && cq < subjectInfo.cq * 0.33) failed = true;
+            if (subjectInfo.ca > 0 && ca < subjectInfo.ca * 0.33) failed = true;
+            if (subjectInfo.p > 0 && p < subjectInfo.p * 0.33) failed = true;
+            const percentage = (total / subjectInfo.total) * 100;
+            const gradeInfo = getGradeInfo(percentage);
+            const gradeCell = row.querySelector('.grade');
+            if (failed) {
+                gradeCell.textContent = 'F';
+                gradeCell.classList.add('text-red-500', 'font-bold');
+            } else {
+                gradeCell.textContent = gradeInfo.grade;
+                gradeCell.classList.remove('text-red-500', 'font-bold');
+                if (gradeInfo.grade === 'A+') {
+                    gradeCell.classList.add('text-green-600', 'font-bold');
+                }
+            }
+        }
+        function clearForm(classNumber) {
+            setupInputForm(classNumber);
+        }
+        async function saveResult(classNumber) {
+            const studentName = document.getElementById('student-name').value.trim();
+            const studentId = document.getElementById('student-id').value.trim();
+            if (!studentName || !studentId) {
+                alert('Please fill in Student Name and ID.');
+                return;
+            }
+            const marksData = [];
+            const rows = document.querySelectorAll('#marks-table-body tr');
+            rows.forEach(row => {
+                const cq = row.querySelector('[data-type="cq"]').value || 0;
+                const ca = row.querySelector('[data-type="ca"]').value || 0;
+                const p = row.querySelector('[data-type="p"]').value || 0;
+                marksData.push({
+                    cq: parseInt(cq),
+                    ca: parseInt(ca),
+                    p: parseInt(p),
+                });
+            });
+            const resultData = {
+                name: studentName,
+                id: studentId,
+                class: classNumber,
+                marks: marksData,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            };
+            try {
+                await resultsCollection.doc(`${classNumber}_${studentId}`).set(resultData);
+                alert('Result saved successfully!');
+                const stay = confirm("Do you want to input another result for Class " + classNumber + "?");
+                if (stay) {
+                    clearForm(classNumber);
+                } else {
+                    goHome();
+                }
+            } catch (error) {
+                console.error("Error saving result: ", error);
+                alert('Error saving result. Please check the console.');
+            }
+        }
+        
+        // Search from home page
+        async function searchResultFromHome() {
+            const classNumber = document.getElementById('home-search-class').value;
+            const studentId = document.getElementById('home-search-id').value.trim();
+            if (!studentId) {
+                alert('Please enter a Student ID.');
+                return;
+            }
+            try {
+                const docRef = resultsCollection.doc(`${classNumber}_${studentId}`);
+                const docSnap = await docRef.get();
+                if (docSnap.exists) {
+                    const studentData = docSnap.data();
+                    const allClassResults = await fetchAllResultsForMerit(classNumber);
+                    displayResult(studentData, allClassResults, 'home-result-display-area');
+                } else {
+                    showModal('not-found-modal');
+                }
+            } catch (error) {
+                console.error("Error searching for result: ", error);
+                alert("An error occurred while searching. Please check the console.");
+            }
+        }
+        
+        // Search from search page
+        async function searchResult() {
+            const classNumber = document.getElementById('search-class').value;
+            const studentId = document.getElementById('search-id').value.trim();
+            if (!studentId) {
+                alert('Please enter a Student ID.');
+                return;
+            }
+            try {
+                const docRef = resultsCollection.doc(`${classNumber}_${studentId}`);
+                const docSnap = await docRef.get();
+                if (docSnap.exists) {
+                    const studentData = docSnap.data();
+                    const allClassResults = await fetchAllResultsForMerit(classNumber);
+                    displayResult(studentData, allClassResults, 'result-display-area');
+                } else {
+                    showModal('not-found-modal');
+                }
+            } catch (error) {
+                console.error("Error searching for result: ", error);
+                alert("An error occurred while searching. Please check the console.");
+            }
+        }
+        
+        async function fetchAllResultsForMerit(classNumber) {
+            const querySnapshot = await resultsCollection.where("class", "==", parseInt(classNumber)).get();
+            const results = [];
+            querySnapshot.forEach((doc) => {
+                results.push(doc.data());
+            });
+            return results;
+        }
+        
+        function displayResult(studentData, allClassResults, displayAreaId) {
+            const { name, id, class: classNumber, marks } = studentData;
+            const classSubjects = subjects[classNumber];
+            let totalMarksObtained = 0;
+            let totalGPs = 0;
+            let totalSubjectsForGpa = 0;
+            let isFail = false;
+            let optionalSubjectGP = 0;
+            const processedMarks = marks.map((mark, i) => {
+                const subjectInfo = classSubjects[i];
+                const total = mark.cq + mark.ca + mark.p;
+                totalMarksObtained += total;
+                const percentage = (total / subjectInfo.total) * 100;
+                
+                let failed = false;
+                if (total < subjectInfo.total * 0.33) failed = true;
+                if (subjectInfo.cq > 0 && mark.cq < subjectInfo.cq * 0.33) failed = true;
+                if (subjectInfo.ca > 0 && mark.ca < subjectInfo.ca * 0.33) failed = true;
+                if (subjectInfo.p > 0 && mark.p < subjectInfo.p * 0.33) failed = true;
+                const gradeInfo = getGradeInfo(percentage);
+                const finalGrade = failed ? { grade: 'F', gp: 0.00 } : gradeInfo;
+                if (finalGrade.grade === 'F') {
+                    isFail = true;
+                }
+                
+                if (!subjectInfo.optional) {
+                    totalGPs += finalGrade.gp;
+                    totalSubjectsForGpa++;
+                } else {
+                    optionalSubjectGP = finalGrade.gp;
+                }
+                return { ...mark, total, ...finalGrade };
+            });
+            
+            if (optionalSubjectGP > 2) {
+                totalGPs += (optionalSubjectGP - 2);
+            }
+            
+            const finalGPA = isFail ? 0.00 : (totalGPs / totalSubjectsForGpa).toFixed(2);
+            const finalGrade = getGradeInfo((finalGPA / 5) * 100).grade;
+            
+            const sortedResults = allClassResults
+                .map(res => {
+                    const total = res.marks.reduce((acc, curr) => acc + curr.cq + curr.ca + curr.p, 0);
+                    return { id: res.id, total };
+                })
+                .sort((a, b) => b.total - a.total);
+            
+            const meritPosition = sortedResults.findIndex(res => res.id === id) + 1;
+            
+            document.getElementById('congrats-details').innerHTML = `${name}<br>Total Marks: ${totalMarksObtained} | GPA: ${finalGPA}`;
+            showModal('congrats-modal');
+            createConfetti();
+            setTimeout(() => {
+                closeModal('congrats-modal');
+            }, 3000);
+            
+            const resultHTML = `
+                <div class="bg-white p-8 rounded-2xl shadow-xl" id="result-sheet">
+                    <div class="text-center mb-8">
+                        <div class="inline-block p-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full mb-4">
+                            <i class="fas fa-graduation-cap text-white text-2xl"></i>
+                        </div>
+                        <h2 class="text-3xl font-bold text-gray-800">M.N.Academy Vocational Result</h2>
+                        <p class="text-gray-600">SSC Vocational Examination</p>
+                    </div>
+                    
+                    <div class="mb-8 p-6 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl border border-blue-100">
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                            <div class="p-4 bg-white rounded-lg shadow-sm">
+                                <p class="text-sm text-gray-500">Total Marks</p>
+                                <p class="text-2xl font-bold text-blue-600">${totalMarksObtained}</p>
+                            </div>
+                            <div class="p-4 bg-white rounded-lg shadow-sm">
+                                <p class="text-sm text-gray-500">Final GPA</p>
+                                <p class="text-2xl font-bold ${isFail ? 'text-red-500' : 'text-green-600'}">${isFail ? 'FAIL' : finalGPA}</p>
+                            </div>
+                            <div class="p-4 bg-white rounded-lg shadow-sm">
+                                <p class="text-sm text-gray-500">Final Grade</p>
+                                <p class="text-2xl font-bold ${isFail ? 'text-red-500' : 'text-purple-600'}">${isFail ? 'F' : finalGrade}</p>
+                            </div>
+                            <div class="p-4 bg-white rounded-lg shadow-sm">
+                                <p class="text-sm text-gray-500">Merit Position</p>
+                                <p class="text-2xl font-bold ${isFail ? 'text-gray-500' : 'text-indigo-600'}">${isFail ? 'N/A' : meritPosition}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-3 gap-4 mb-8">
+                        <div class="p-4 bg-gray-50 rounded-lg"><strong>Name:</strong> ${name}</div>
+                        <div class="p-4 bg-gray-50 rounded-lg"><strong>ID:</strong> ${id}</div>
+                        <div class="p-4 bg-gray-50 rounded-lg"><strong>Class:</strong> ${classNumber}</div>
+                    </div>
+                    
+                    <div class="overflow-x-auto rounded-lg border border-gray-200">
+                         <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gradient-to-r from-blue-500 to-purple-600 text-white">
+                                <tr>
+                                    <th class="px-6 py-4 text-left text-sm font-medium uppercase">Subject</th>
+                                    <th class="px-6 py-4 text-center text-sm font-medium uppercase">Total Mark</th>
+                                    <th class="px-6 py-4 text-center text-sm font-medium uppercase">Obtained Mark</th>
+                                    <th class="px-6 py-4 text-center text-sm font-medium uppercase">Grade</th>
+                                    <th class="px-6 py-4 text-center text-sm font-medium uppercase">GP</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                            ${classSubjects.map((sub, i) => `
+                                <tr class="table-row">
+                                    <td class="px-6 py-4">${sub.name}</td>
+                                    <td class="px-6 py-4 text-center">${sub.total}</td>
+                                    <td class="px-6 py-4 text-center">${processedMarks[i].total}</td>
+                                    <td class="px-6 py-4 text-center ${processedMarks[i].grade === 'F' ? 'text-red-500 font-bold' : processedMarks[i].grade === 'A+' ? 'text-green-600 font-bold' : ''}">${processedMarks[i].grade}</td>
+                                    <td class="px-6 py-4 text-center">${processedMarks[i].gp.toFixed(2)}</td>
+                                </tr>
+                            `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="mt-8 text-center no-print">
+                         <button onclick="printResult('${name}', '${id}', '${classNumber}', ${totalMarksObtained}, '${finalGPA}', '${finalGrade}', '${meritPosition}')" class="btn-primary text-white font-bold py-3 px-6 rounded-lg transition flex items-center space-x-2 mx-auto">
+                            <i class="fas fa-print"></i>
+                            <span>Print Result</span>
+                         </button>
+                    </div>
+                </div>
+            `;
+            document.getElementById(displayAreaId).innerHTML = resultHTML;
+        }
+        
+        function createConfetti() {
+            const colors = ['#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5', '#2196f3', '#03a9f4', '#00bcd4', '#009688', '#4CAF50'];
+            const confettiCount = 100;
+            
+            for (let i = 0; i < confettiCount; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.animationDelay = Math.random() * 3 + 's';
+                confetti.style.width = Math.random() * 10 + 5 + 'px';
+                confetti.style.height = Math.random() * 15 + 10 + 'px';
+                document.body.appendChild(confetti);
+                
+                setTimeout(() => {
+                    confetti.remove();
+                }, 3000);
+            }
+        }
+        
+        function printResult(name, id, classNumber, totalMarks, gpa, grade, merit) {
+            const tableRows = document.querySelectorAll('#result-sheet tbody tr');
+            let tableHTML = '';
+            tableRows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                tableHTML += `<tr style="border-bottom: 1px solid #ddd;">
+                    <td style="padding: 8px 10px; font-size: 13px;">${cells[0].textContent}</td>
+                    <td style="padding: 8px 10px; text-align: center; font-size: 13px;">${cells[1].textContent}</td>
+                    <td style="padding: 8px 10px; text-align: center; font-size: 13px;">${cells[2].textContent}</td>
+                    <td style="padding: 8px 10px; text-align: center; font-size: 13px; ${cells[3].textContent === 'F' ? 'color: red; font-weight: bold;' : cells[3].textContent === 'A+' ? 'color: green; font-weight: bold;' : ''}">${cells[3].textContent}</td>
+                    <td style="padding: 8px 10px; text-align: center; font-size: 13px;">${cells[4].textContent}</td>
+                </tr>`;
+            });
+            
+            const printContent = `
+                <div style="max-width: 210mm; margin: 0 auto; font-family: Arial, sans-serif; padding: 10mm;">
+                    <div style="text-align: center; border-bottom: 3px solid #333; padding-bottom: 12px; margin-bottom: 18px;">
+                        <h1 style="margin: 0; font-size: 26px; color: #333;">M.N.Academy</h1>
+                        <p style="margin: 8px 0 0 0; font-size: 16px; color: #666;">Vocational Result - SSC Examination</p>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 18px; border: 2px solid #333; padding: 12px; background-color: #f9f9f9;">
+                        <div style="font-size: 14px;"><strong>Name:</strong> ${name}</div>
+                        <div style="font-size: 14px;"><strong>ID:</strong> ${id}</div>
+                        <div style="font-size: 14px;"><strong>Class:</strong> ${classNumber}</div>
+                    </div>
+                    
+                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 18px; border: 2px solid #333;">
+                        <thead>
+                            <tr style="background-color: #4a5568; color: white;">
+                                <th style="padding: 10px; text-align: left; font-size: 13px; border: 1px solid #333;">Subject</th>
+                                <th style="padding: 10px; text-align: center; font-size: 13px; border: 1px solid #333;">Total</th>
+                                <th style="padding: 10px; text-align: center; font-size: 13px; border: 1px solid #333;">Obtained</th>
+                                <th style="padding: 10px; text-align: center; font-size: 13px; border: 1px solid #333;">Grade</th>
+                                <th style="padding: 10px; text-align: center; font-size: 13px; border: 1px solid #333;">GP</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${tableHTML}
+                        </tbody>
+                    </table>
+                    
+                    <div style="display: flex; justify-content: space-around; border: 2px solid #333; padding: 14px; background-color: #f0f4f8; margin-bottom: 20px;">
+                        <div style="text-align: center; font-size: 14px;"><strong>Total Marks:</strong><br><span style="font-size: 18px; font-weight: bold;">${totalMarks}</span></div>
+                        <div style="text-align: center; font-size: 14px;"><strong>GPA:</strong><br><span style="font-size: 18px; font-weight: bold;">${gpa}</span></div>
+                        <div style="text-align: center; font-size: 14px;"><strong>Grade:</strong><br><span style="font-size: 18px; font-weight: bold;">${grade}</span></div>
+                        <div style="text-align: center; font-size: 14px;"><strong>Merit Position:</strong><br><span style="font-size: 18px; font-weight: bold;">${merit}</span></div>
+                    </div>
+                    
+                    <div style="text-align: center; margin-top: 30px; padding-top: 15px; border-top: 1px solid #ccc;">
+                        <p style="font-size: 11px; color: #666; margin: 5px 0;">Developed by <strong>BAPPI</strong></p>
+                        <p style="font-size: 10px; color: #999; margin: 0;">M.N.Academy Result Management System © 2025</p>
+                    </div>
+                </div>
+            `;
+            
+            const printArea = document.getElementById('print-area');
+            printArea.innerHTML = printContent;
+            window.print();
+            printArea.innerHTML = '';
+        }
+        
+        function showModal(modalId) {
+            document.getElementById(modalId).classList.remove('hidden');
+        }
+        
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+        }
+        
+        async function fetchAllResults(classNumber) {
+            document.getElementById('class-selection-all').classList.add('hidden');
+            const container = document.getElementById('all-results-container');
+            container.innerHTML = `<div class="text-center py-8"><i class="fas fa-spinner fa-spin text-3xl text-blue-500 mb-4"></i><p class="text-gray-600">Loading results for Class ${classNumber}...</p></div>`;
+            try {
+                const querySnapshot = await resultsCollection.where("class", "==", classNumber).get();
+                let allResultsData = [];
+                querySnapshot.forEach(doc => allResultsData.push(doc.data()));
+                
+                allResultsData.forEach(res => {
+                    res.totalMarks = res.marks.reduce((acc, mark) => acc + mark.cq + mark.ca + mark.p, 0);
+                });
+                if (allResultsData.length === 0) {
+                     container.innerHTML = `<p class="text-center text-gray-500 py-8">No results found for Class ${classNumber}.</p>`;
+                     return;
+                }
+                const tableHTML = `
+                    <div class="flex justify-between items-center mb-6 no-print">
+                         <h3 class="text-xl font-semibold text-gray-800">All Records for Class ${classNumber}</h3>
+                         <div class="flex space-x-2">
+                            <button onclick="printAllResults(${classNumber})" class="bg-blue-500 text-white px-4 py-2 rounded-lg transition flex items-center space-x-2">
+                                <i class="fas fa-print"></i>
+                                <span>Print All</span>
+                            </button>
+                            <button onclick="downloadAllPDF(${classNumber})" class="bg-green-500 text-white px-4 py-2 rounded-lg transition flex items-center space-x-2">
+                                <i class="fas fa-download"></i>
+                                <span>Download PDF</span>
+                            </button>
+                         </div>
+                    </div>
+                    <div class="overflow-x-auto rounded-lg border border-gray-200">
+                        <table class="min-w-full divide-y divide-gray-200" id="all-results-table">
+                             <thead class="bg-gradient-to-r from-blue-500 to-purple-600 text-white">
+                                <tr>
+                                    <th class="px-6 py-4 text-left text-sm font-medium uppercase">Student ID</th>
+                                    <th class="px-6 py-4 text-left text-sm font-medium uppercase">Student Name</th>
+                                    <th class="px-6 py-4 text-left text-sm font-medium uppercase">Total Marks</th>
+                                    <th class="px-6 py-4 text-left text-sm font-medium uppercase no-print">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                ${allResultsData.map(res => `
+                                    <tr id="row-${res.id}" class="table-row">
+                                        <td class="px-6 py-4">${res.id}</td>
+                                        <td class="px-6 py-4">${res.name}</td>
+                                        <td class="px-6 py-4 font-semibold">${res.totalMarks}</td>
+                                        <td class="px-6 py-4 no-print">
+                                            <button onclick="printStudentResultFromList('${res.class}', '${res.id}')" class="text-blue-600 hover:text-blue-900 mr-3 transition"><i class="fas fa-print mr-1"></i>Print</button>
+                                            <button onclick="editResult('${res.class}', '${res.id}')" class="text-indigo-600 hover:text-indigo-900 mr-3 transition"><i class="fas fa-edit mr-1"></i>Edit</button>
+                                            <button onclick="deleteResult('${res.class}', '${res.id}')" class="text-red-600 hover:text-red-900 transition"><i class="fas fa-trash-alt mr-1"></i>Delete</button>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+                container.innerHTML = tableHTML;
+            } catch(error) {
+                console.error("Error fetching all results: ", error);
+                container.innerHTML = `<p class="text-red-500 text-center py-8">Error loading results.</p>`;
+            }
+        }
+        
+        async function editResult(classNumber, studentId) {
+            const docRef = resultsCollection.doc(`${classNumber}_${studentId}`);
+            const docSnap = await docRef.get();
+            if (docSnap.exists) {
+                const studentData = docSnap.data();
+                showPage('input-result-page');
+                setupInputForm(parseInt(classNumber), studentData);
+            }
+        }
+        async function deleteResult(classNumber, studentId) {
+            if (confirm(`Are you sure you want to delete the result for student ID ${studentId}?`)) {
+                try {
+                    await resultsCollection.doc(`${classNumber}_${studentId}`).delete();
+                    alert("Result deleted successfully.");
+                    const row = document.getElementById(`row-${studentId}`);
+                    if (row) row.remove();
+                } catch (error) {
+                    console.error("Error deleting document: ", error);
+                    alert("Error deleting result.");
+                }
+            }
+        }
+        
+        async function printStudentResultFromList(classNumber, studentId) {
+            try {
+                const docRef = resultsCollection.doc(`${classNumber}_${studentId}`);
+                const docSnap = await docRef.get();
+                if (docSnap.exists) {
+                    const studentData = docSnap.data();
+                    const { name, id, class: cls, marks } = studentData;
+                    const classSubjects = subjects[cls];
+                    
+                    let totalMarksObtained = 0;
+                    let totalGPs = 0;
+                    let totalSubjectsForGpa = 0;
+                    let isFail = false;
+                    let optionalSubjectGP = 0;
+                    
+                    const processedMarks = marks.map((mark, i) => {
+                        const subjectInfo = classSubjects[i];
+                        const total = mark.cq + mark.ca + mark.p;
+                        totalMarksObtained += total;
+                        const percentage = (total / subjectInfo.total) * 100;
+                        
+                        let failed = false;
+                        if (total < subjectInfo.total * 0.33) failed = true;
+                        if (subjectInfo.cq > 0 && mark.cq < subjectInfo.cq * 0.33) failed = true;
+                        if (subjectInfo.ca > 0 && mark.ca < subjectInfo.ca * 0.33) failed = true;
+                        if (subjectInfo.p > 0 && mark.p < subjectInfo.p * 0.33) failed = true;
+                        
+                        const gradeInfo = getGradeInfo(percentage);
+                        const finalGrade = failed ? { grade: 'F', gp: 0.00 } : gradeInfo;
+                        if (finalGrade.grade === 'F') {
+                            isFail = true;
+                        }
+                        
+                        if (!subjectInfo.optional) {
+                            totalGPs += finalGrade.gp;
+                            totalSubjectsForGpa++;
+                        } else {
+                            optionalSubjectGP = finalGrade.gp;
+                        }
+                        return { ...mark, total, ...finalGrade, subject: subjectInfo.name, totalMarks: subjectInfo.total };
+                    });
+                    
+                    if (optionalSubjectGP > 2) {
+                        totalGPs += (optionalSubjectGP - 2);
+                    }
+                    
+                    const finalGPA = isFail ? 0.00 : (totalGPs / totalSubjectsForGpa).toFixed(2);
+                    const finalGrade = getGradeInfo((finalGPA / 5) * 100).grade;
+                    
+                    const allClassResults = await fetchAllResultsForMerit(cls);
+                    const sortedResults = allClassResults
+                        .map(res => {
+                            const total = res.marks.reduce((acc, curr) => acc + curr.cq + curr.ca + curr.p, 0);
+                            return { id: res.id, total };
+                        })
+                        .sort((a, b) => b.total - a.total);
+                    
+                    const meritPosition = sortedResults.findIndex(res => res.id === id) + 1;
+                    
+                    let tableHTML = '';
+                    processedMarks.forEach(mark => {
+                        tableHTML += `<tr style="border-bottom: 1px solid #ddd;">
+                            <td style="padding: 8px 10px; font-size: 13px;">${mark.subject}</td>
+                            <td style="padding: 8px 10px; text-align: center; font-size: 13px;">${mark.totalMarks}</td>
+                            <td style="padding: 8px 10px; text-align: center; font-size: 13px;">${mark.total}</td>
+                            <td style="padding: 8px 10px; text-align: center; font-size: 13px; ${mark.grade === 'F' ? 'color: red; font-weight: bold;' : mark.grade === 'A+' ? 'color: green; font-weight: bold;' : ''}">${mark.grade}</td>
+                            <td style="padding: 8px 10px; text-align: center; font-size: 13px;">${mark.gp.toFixed(2)}</td>
+                        </tr>`;
+                    });
+                    
+                    const printContent = `
+                        <div style="max-width: 210mm; margin: 0 auto; font-family: Arial, sans-serif; padding: 10mm;">
+                            <div style="text-align: center; border-bottom: 3px solid #333; padding-bottom: 12px; margin-bottom: 18px;">
+                                <h1 style="margin: 0; font-size: 26px; color: #333;">M.N.Academy</h1>
+                                <p style="margin: 8px 0 0 0; font-size: 16px; color: #666;">Vocational Result - SSC Examination</p>
+                            </div>
+                            
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 18px; border: 2px solid #333; padding: 12px; background-color: #f9f9f9;">
+                                <div style="font-size: 14px;"><strong>Name:</strong> ${name}</div>
+                                <div style="font-size: 14px;"><strong>ID:</strong> ${id}</div>
+                                <div style="font-size: 14px;"><strong>Class:</strong> ${cls}</div>
+                            </div>
+                            
+                            <table style="width: 100%; border-collapse: collapse; margin-bottom: 18px; border: 2px solid #333;">
+                                <thead>
+                                    <tr style="background-color: #4a5568; color: white;">
+                                        <th style="padding: 10px; text-align: left; font-size: 13px; border: 1px solid #333;">Subject</th>
+                                        <th style="padding: 10px; text-align: center; font-size: 13px; border: 1px solid #333;">Total</th>
+                                        <th style="padding: 10px; text-align: center; font-size: 13px; border: 1px solid #333;">Obtained</th>
+                                        <th style="padding: 10px; text-align: center; font-size: 13px; border: 1px solid #333;">Grade</th>
+                                        <th style="padding: 10px; text-align: center; font-size: 13px; border: 1px solid #333;">GP</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${tableHTML}
+                                </tbody>
+                            </table>
+                            
+                            <div style="display: flex; justify-content: space-around; border: 2px solid #333; padding: 14px; background-color: #f0f4f8; margin-bottom: 20px;">
+                                <div style="text-align: center; font-size: 14px;"><strong>Total Marks:</strong><br><span style="font-size: 18px; font-weight: bold;">${totalMarksObtained}</span></div>
+                                <div style="text-align: center; font-size: 14px;"><strong>GPA:</strong><br><span style="font-size: 18px; font-weight: bold;">${isFail ? 'FAIL' : finalGPA}</span></div>
+                                <div style="text-align: center; font-size: 14px;"><strong>Grade:</strong><br><span style="font-size: 18px; font-weight: bold;">${isFail ? 'F' : finalGrade}</span></div>
+                                <div style="text-align: center; font-size: 14px;"><strong>Merit Position:</strong><br><span style="font-size: 18px; font-weight: bold;">${isFail ? 'N/A' : meritPosition}</span></div>
+                            </div>
+                            
+                            <div style="text-align: center; margin-top: 30px; padding-top: 15px; border-top: 1px solid #ccc;">
+                                <p style="font-size: 11px; color: #666; margin: 5px 0;">Developed by <strong>BAPPI</strong></p>
+                                <p style="font-size: 10px; color: #999; margin: 0;">M.N.Academy Result Management System © 2025</p>
+                            </div>
+                        </div>
+                    `;
+                    
+                    const printArea = document.getElementById('print-area');
+                    printArea.innerHTML = printContent;
+                    window.print();
+                    printArea.innerHTML = '';
+                }
+            } catch (error) {
+                console.error("Error printing result: ", error);
+                alert("Error loading result for printing.");
+            }
+        }
+        
+        async function printAllResults(classNumber) {
+            const querySnapshot = await resultsCollection.where("class", "==", classNumber).get();
+            let allResultsHTML = `<h1 style="text-align: center; font-size: 24px; margin-bottom: 20px;">All Results for Class ${classNumber}</h1>`;
+            
+            let counter = 0;
+            querySnapshot.forEach((doc) => {
+                const res = doc.data();
+                const totalMarks = res.marks.reduce((acc, mark) => acc + mark.cq + mark.ca + mark.p, 0);
+                allResultsHTML += `
+                    <div style="border: 1px solid #ccc; padding: 15px; margin-bottom: 20px; page-break-inside: avoid;">
+                        <h3>${res.name} (ID: ${res.id})</h3>
+                        <p>Total Marks: ${totalMarks}</p>
+                    </div>
+                `;
+                counter++;
+            });
+            if (counter === 0) {
+                alert("No results to print.");
+                return;
+            }
+            const printArea = document.getElementById('print-area');
+            printArea.innerHTML = allResultsHTML;
+            window.print();
+            printArea.innerHTML = '';
+        }
+        async function downloadAllPDF(classNumber) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            const querySnapshot = await resultsCollection.where("class", "==", classNumber).get();
+            const body = [];
+            querySnapshot.forEach(docSnap => {
+                const res = docSnap.data();
+                const totalMarks = res.marks.reduce((acc, mark) => acc + mark.cq + mark.ca + mark.p, 0);
+                body.push([res.id, res.name, totalMarks]);
+            });
+            if (body.length === 0) {
+                alert("No data to generate PDF.");
+                return;
+            }
+            doc.autoTable({
+                head: [['Student ID', 'Student Name', 'Total Marks']],
+                body: body,
+                didDrawPage: function(data) {
+                    doc.text(`All Results - Class ${classNumber}`, data.settings.margin.left, 15);
+                }
+            });
+            doc.save(`class-${classNumber}-results.pdf`);
+        }
+        
+        // --- INITIALIZATION ---
+        window.onload = function() {
+            showPage('home-page');
+        };
+    </script>
+</body>
+</html>
