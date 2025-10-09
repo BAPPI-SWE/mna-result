@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google-site-verification" content="EtD2O8KPOYCwgph8xOvrKiPd6EtMmqifXWTCPvM5Egs" />
     <title>M.N.Academy Vocational Result</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -39,6 +40,13 @@
             from { opacity: 0; transform: scale(0.9); }
             to { opacity: 1; transform: scale(1); }
         }
+        /* Mobile menu toggle */
+        .mobile-menu {
+            display: none;
+        }
+        .mobile-menu.active {
+            display: block;
+        }
         /* Print-specific styles */
         @media print {
             body {
@@ -65,20 +73,13 @@
                 margin: 15mm;
             }
         }
-        /* Custom glass effect */
-        .glass {
-            background: rgba(255, 255, 255, 0.25);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.18);
-        }
         /* Custom button styles */
         .btn-primary {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             transition: all 0.3s ease;
         }
         .btn-primary:hover {
-            transform: translateY(-3px);
+            transform: translateY(-2px);
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
         }
         .btn-secondary {
@@ -86,7 +87,7 @@
             transition: all 0.3s ease;
         }
         .btn-secondary:hover {
-            transform: translateY(-3px);
+            transform: translateY(-2px);
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
         }
         .btn-success {
@@ -94,25 +95,18 @@
             transition: all 0.3s ease;
         }
         .btn-success:hover {
-            transform: translateY(-3px);
+            transform: translateY(-2px);
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
         }
         /* Card hover effect */
         .card-hover {
             transition: all 0.3s ease;
         }
-        .card-hover:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
-        }
-        /* Input field styling */
-        .input-field {
-            border: 1px solid #e2e8f0;
-            transition: all 0.3s ease;
-        }
-        .input-field:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        @media (min-width: 768px) {
+            .card-hover:hover {
+                transform: translateY(-10px);
+                box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            }
         }
         /* Table styling */
         .table-row {
@@ -120,6 +114,35 @@
         }
         .table-row:hover {
             background-color: #f8fafc;
+        }
+        /* Responsive table wrapper */
+        .table-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        /* Mobile optimized table */
+        @media (max-width: 768px) {
+            .mobile-card-table tr {
+                display: block;
+                margin-bottom: 1rem;
+                border: 1px solid #e2e8f0;
+                border-radius: 0.5rem;
+                padding: 0.5rem;
+            }
+            .mobile-card-table td {
+                display: flex;
+                justify-content: space-between;
+                padding: 0.5rem !important;
+                border: none !important;
+            }
+            .mobile-card-table td:before {
+                content: attr(data-label);
+                font-weight: 600;
+                margin-right: 1rem;
+            }
+            .mobile-card-table thead {
+                display: none;
+            }
         }
         /* Confetti animation */
         @keyframes confetti-fall {
@@ -134,6 +157,14 @@
             animation: confetti-fall 3s linear forwards;
             z-index: 1000;
         }
+        /* Mobile sticky header */
+        @media (max-width: 768px) {
+            nav {
+                position: sticky;
+                top: 0;
+                z-index: 50;
+            }
+        }
     </style>
 </head>
 <body class="antialiased text-gray-800">
@@ -145,41 +176,61 @@
                     <div class="bg-gradient-to-r from-purple-500 to-indigo-600 text-white p-2 rounded-lg">
                         <i class="fas fa-graduation-cap text-xl"></i>
                     </div>
-                    <h1 class="text-xl font-bold text-gray-800">M.N.Academy Vocational Result</h1>
+                    <h1 class="text-lg md:text-xl font-bold text-gray-800">M.N.Academy</h1>
                 </div>
-                <div class="flex space-x-4">
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex space-x-4">
                     <button onclick="showPage('search-result-page')" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg transition flex items-center space-x-2">
                         <i class="fas fa-search"></i>
-                        <span>Search Result</span>
+                        <span>Search</span>
                     </button>
                     <button onclick="showPasswordModal('input-result-page')" class="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg transition flex items-center space-x-2">
                         <i class="fas fa-plus-circle"></i>
-                        <span>Input Result</span>
+                        <span>Input</span>
                     </button>
                     <button onclick="showPasswordModal('all-results-page')" class="bg-purple-500 hover:bg-purple-600 text-white font-semibold py-2 px-4 rounded-lg transition flex items-center space-x-2">
                         <i class="fas fa-list-alt"></i>
-                        <span>All Records</span>
+                        <span>Records</span>
                     </button>
                 </div>
+                <!-- Mobile Menu Toggle -->
+                <button onclick="toggleMobileMenu()" class="md:hidden text-gray-800">
+                    <i class="fas fa-bars text-2xl"></i>
+                </button>
+            </div>
+            <!-- Mobile Menu -->
+            <div id="mobile-menu" class="mobile-menu md:hidden pb-4">
+                <button onclick="showPage('search-result-page'); toggleMobileMenu();" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg transition flex items-center justify-center space-x-2 mb-2">
+                    <i class="fas fa-search"></i>
+                    <span>Search Result</span>
+                </button>
+                <button onclick="showPasswordModal('input-result-page'); toggleMobileMenu();" class="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-4 rounded-lg transition flex items-center justify-center space-x-2 mb-2">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>Input Result</span>
+                </button>
+                <button onclick="showPasswordModal('all-results-page'); toggleMobileMenu();" class="w-full bg-purple-500 hover:bg-purple-600 text-white font-semibold py-3 px-4 rounded-lg transition flex items-center justify-center space-x-2">
+                    <i class="fas fa-list-alt"></i>
+                    <span>All Records</span>
+                </button>
             </div>
         </div>
     </nav>
     <div id="app-container" class="container mx-auto p-4 md:p-8 max-w-7xl">
         <!-- Home Page -->
         <div id="home-page" class="page">
-            <header class="text-center my-12">
-                <div class="inline-block p-2 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full mb-6">
-                    <i class="fas fa-graduation-cap text-white text-4xl"></i>
+            <header class="text-center my-6 md:my-12">
+                <div class="inline-block p-2 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full mb-4 md:mb-6">
+                    <i class="fas fa-graduation-cap text-white text-3xl md:text-4xl"></i>
                 </div>
-                <h1 class="text-5xl md:text-6xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">M.N.Academy</h1>
-                <p class="text-2xl text-gray-700 mb-2">Vocational Result Management System</p>
-                <p class="text-gray-600">SSC Vocational Board</p>
+                <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">M.N.Academy</h1>
+                <p class="text-xl md:text-2xl text-gray-700 mb-2">Vocational Result Management</p>
+                <p class="text-sm md:text-base text-gray-600">SSC Vocational Board</p>
             </header>
             <main class="max-w-4xl mx-auto">
-                <div class="bg-white p-12 rounded-2xl shadow-2xl card-hover text-center">
-                    <h2 class="text-3xl font-bold text-gray-800 mb-6">Search for Student Result</h2>
-                    <p class="text-gray-600 mb-8">Enter student details to view their examination results</p>
-                    <div class="max-w-md mx-auto space-y-6">
+                <div class="bg-white p-6 md:p-12 rounded-2xl shadow-2xl card-hover text-center">
+                    <h2 class="text-2xl md:text-3xl font-bold text-gray-800 mb-4 md:mb-6">Search Student Result</h2>
+                    <p class="text-gray-600 mb-6 md:mb-8">Enter student details to view results</p>
+                    <div class="max-w-md mx-auto space-y-4 md:space-y-6">
                         <div>
                             <label for="home-search-class" class="block text-sm font-medium text-gray-700 text-left mb-2">Class</label>
                             <select id="home-search-class" class="w-full py-3 px-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
@@ -202,38 +253,40 @@
         </div>
         <!-- Input Result Page -->
         <div id="input-result-page" class="page">
-            <header class="mb-8 flex justify-between items-center">
-                <h1 class="text-3xl font-bold text-gray-800">Input Student Result</h1>
+            <header class="mb-6 md:mb-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+                <h1 class="text-2xl md:text-3xl font-bold text-gray-800">Input Student Result</h1>
                 <button onclick="goHome()" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded-lg transition flex items-center space-x-2">
                     <i class="fas fa-home"></i>
                     <span>Home</span>
                 </button>
             </header>
             <div id="class-selection-input" class="text-center">
-                <h2 class="text-2xl mb-6 text-gray-700">Select Class to Input Result</h2>
-                <button onclick="setupInputForm(9)" class="btn-primary text-white font-bold py-4 px-8 rounded-lg transition mr-4">
-                    <i class="fas fa-user-graduate mr-2"></i>Class 9
-                </button>
-                <button onclick="setupInputForm(10)" class="btn-success text-white font-bold py-4 px-8 rounded-lg transition">
-                    <i class="fas fa-user-graduate mr-2"></i>Class 10
-                </button>
+                <h2 class="text-xl md:text-2xl mb-4 md:mb-6 text-gray-700">Select Class to Input Result</h2>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <button onclick="setupInputForm(9)" class="btn-primary text-white font-bold py-4 px-8 rounded-lg transition w-full sm:w-auto">
+                        <i class="fas fa-user-graduate mr-2"></i>Class 9
+                    </button>
+                    <button onclick="setupInputForm(10)" class="btn-success text-white font-bold py-4 px-8 rounded-lg transition w-full sm:w-auto">
+                        <i class="fas fa-user-graduate mr-2"></i>Class 10
+                    </button>
+                </div>
             </div>
-            <div id="input-form-container" class="hidden mt-8 bg-white p-8 rounded-2xl shadow-xl">
+            <div id="input-form-container" class="hidden mt-8 bg-white p-4 md:p-8 rounded-2xl shadow-xl">
                 <!-- Form content will be dynamically generated here -->
             </div>
         </div>
         
         <!-- Search Result Page -->
         <div id="search-result-page" class="page">
-            <header class="mb-8 flex justify-between items-center">
-                <h1 class="text-3xl font-bold text-gray-800">Search for Result</h1>
+            <header class="mb-6 md:mb-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+                <h1 class="text-2xl md:text-3xl font-bold text-gray-800">Search for Result</h1>
                 <button onclick="goHome()" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded-lg transition flex items-center space-x-2">
                     <i class="fas fa-home"></i>
                     <span>Home</span>
                 </button>
             </header>
-            <div class="bg-white p-8 rounded-2xl shadow-xl max-w-md mx-auto">
-                <div class="space-y-6">
+            <div class="bg-white p-6 md:p-8 rounded-2xl shadow-xl max-w-md mx-auto">
+                <div class="space-y-4 md:space-y-6">
                     <div>
                         <label for="search-class" class="block text-sm font-medium text-gray-700 mb-2">Class</label>
                         <select id="search-class" class="w-full py-3 px-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
@@ -255,23 +308,25 @@
         </div>
         <!-- All Results Page -->
         <div id="all-results-page" class="page">
-             <header class="mb-8 flex justify-between items-center no-print">
-                <h1 class="text-3xl font-bold text-gray-800">All Student Records</h1>
+             <header class="mb-6 md:mb-8 flex flex-col sm:flex-row justify-between items-center gap-4 no-print">
+                <h1 class="text-2xl md:text-3xl font-bold text-gray-800">All Student Records</h1>
                 <button onclick="goHome()" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded-lg transition flex items-center space-x-2">
                     <i class="fas fa-home"></i>
                     <span>Home</span>
                 </button>
             </header>
              <div id="class-selection-all" class="text-center no-print">
-                <h2 class="text-2xl mb-6 text-gray-700">Select Class to View Records</h2>
-                <button onclick="fetchAllResults(9)" class="btn-primary text-white font-bold py-4 px-8 rounded-lg transition mr-4">
-                    <i class="fas fa-user-graduate mr-2"></i>Class 9
-                </button>
-                <button onclick="fetchAllResults(10)" class="btn-success text-white font-bold py-4 px-8 rounded-lg transition">
-                    <i class="fas fa-user-graduate mr-2"></i>Class 10
-                </button>
+                <h2 class="text-xl md:text-2xl mb-4 md:mb-6 text-gray-700">Select Class to View Records</h2>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <button onclick="fetchAllResults(9)" class="btn-primary text-white font-bold py-4 px-8 rounded-lg transition w-full sm:w-auto">
+                        <i class="fas fa-user-graduate mr-2"></i>Class 9
+                    </button>
+                    <button onclick="fetchAllResults(10)" class="btn-success text-white font-bold py-4 px-8 rounded-lg transition w-full sm:w-auto">
+                        <i class="fas fa-user-graduate mr-2"></i>Class 10
+                    </button>
+                </div>
             </div>
-            <div id="all-results-container" class="mt-8 bg-white p-8 rounded-2xl shadow-xl">
+            <div id="all-results-container" class="mt-8 bg-white p-4 md:p-8 rounded-2xl shadow-xl">
                 <!-- All results table will be injected here -->
             </div>
         </div>
@@ -280,12 +335,12 @@
     <!-- Footer -->
     <footer class="text-center py-6 mt-12">
         <p class="text-sm text-gray-600">Developed by <span class="font-semibold text-gray-800">BAPPI</span></p>
-        <p class="text-xs text-gray-500 mt-1">M.N.Academy Result Management System © 2025</p>
+        <p class="text-xs text-gray-500 mt-1">M.N.Academy Result System © 2025</p>
     </footer>
     
     <!-- Modals -->
-    <div id="password-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center hidden z-50">
-        <div class="modal-content bg-white p-8 rounded-2xl shadow-2xl w-full max-w-sm">
+    <div id="password-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center hidden z-50 p-4">
+        <div class="modal-content bg-white p-6 md:p-8 rounded-2xl shadow-2xl w-full max-w-sm">
             <div class="text-center mb-6">
                 <div class="inline-block p-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full mb-4">
                     <i class="fas fa-lock text-white text-xl"></i>
@@ -301,28 +356,28 @@
         </div>
     </div>
     
-    <div id="congrats-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center hidden z-50">
-        <div class="modal-content text-center bg-white p-12 rounded-2xl shadow-2xl max-w-md">
+    <div id="congrats-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center hidden z-50 p-4">
+        <div class="modal-content text-center bg-white p-8 md:p-12 rounded-2xl shadow-2xl max-w-md w-full">
             <div class="mb-6">
                 <div class="inline-block p-4 bg-gradient-to-r from-green-400 to-blue-500 rounded-full mb-4">
                     <i class="fas fa-trophy text-white text-4xl"></i>
                 </div>
-                <h2 class="text-3xl font-bold text-green-500">Congratulations!</h2>
+                <h2 class="text-2xl md:text-3xl font-bold text-green-500">Congratulations!</h2>
             </div>
-            <p id="congrats-details" class="text-lg text-gray-700 mb-4"></p>
+            <p id="congrats-details" class="text-base md:text-lg text-gray-700 mb-4"></p>
             <div class="mt-6 flex justify-center">
                 <div class="w-16 h-1 bg-gradient-to-r from-green-400 to-blue-500 rounded-full"></div>
             </div>
         </div>
     </div>
-    <div id="not-found-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center hidden z-50">
-         <div class="modal-content text-center bg-white p-8 rounded-2xl shadow-2xl max-w-sm">
+    <div id="not-found-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center hidden z-50 p-4">
+         <div class="modal-content text-center bg-white p-6 md:p-8 rounded-2xl shadow-2xl max-w-sm w-full">
             <div class="mb-4">
                 <div class="inline-block p-3 bg-gradient-to-r from-red-400 to-red-600 rounded-full">
                     <i class="fas fa-exclamation-triangle text-white text-xl"></i>
                 </div>
             </div>
-            <h2 class="text-2xl font-bold text-red-500 mb-2">No Result Found</h2>
+            <h2 class="text-xl md:text-2xl font-bold text-red-500 mb-2">No Result Found</h2>
             <p class="text-gray-600">Please check the Class and Student ID and try again.</p>
             <button onclick="closeModal('not-found-modal')" class="mt-6 px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">OK</button>
         </div>
@@ -394,6 +449,13 @@
             if (percentage >= 33) return { grade: 'D', gp: 1.00, remarks: 'Pass' };
             return { grade: 'F', gp: 0.00, remarks: 'Fail' };
         }
+        
+        // --- MOBILE MENU TOGGLE ---
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('active');
+        }
+        
         // --- PAGE NAVIGATION ---
         function showPage(pageId) {
             document.querySelectorAll('.page').forEach(page => {
@@ -404,6 +466,9 @@
                 newPage.style.display = 'block';
                 currentPage = pageId;
             }
+            // Close mobile menu
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.remove('active');
         }
         
         function goHome() {
@@ -445,8 +510,8 @@
             
             const classSubjects = subjects[classNumber];
             let formHTML = `
-                <h2 class="text-2xl font-bold mb-6 text-gray-800">Enter Marks for Class ${classNumber}</h2>
-                <div class="grid md:grid-cols-3 gap-6 mb-8">
+                <h2 class="text-xl md:text-2xl font-bold mb-4 md:mb-6 text-gray-800">Enter Marks for Class ${classNumber}</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8">
                     <div>
                         <label for="student-name" class="block text-sm font-medium text-gray-700 mb-2">Student Name</label>
                         <input type="text" id="student-name" class="w-full py-3 px-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" value="${studentData ? studentData.name : ''}" placeholder="Enter student name">
@@ -460,44 +525,44 @@
                         <input type="text" id="student-class" class="w-full py-3 px-4 border border-gray-300 rounded-lg shadow-sm bg-gray-100" value="${classNumber}" readonly>
                     </div>
                 </div>
-                <div class="overflow-x-auto rounded-lg border border-gray-200">
+                <div class="table-wrapper rounded-lg border border-gray-200">
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gradient-to-r from-blue-500 to-purple-600 text-white">
                             <tr>
-                                <th class="px-6 py-4 text-left text-sm font-medium uppercase">SL</th>
-                                <th class="px-6 py-4 text-left text-sm font-medium uppercase">Subject</th>
-                                <th class="px-6 py-4 text-left text-sm font-medium uppercase">CQ</th>
-                                <th class="px-6 py-4 text-left text-sm font-medium uppercase">CA</th>
-                                <th class="px-6 py-4 text-left text-sm font-medium uppercase">Practical</th>
-                                <th class="px-6 py-4 text-left text-sm font-medium uppercase">Total</th>
-                                <th class="px-6 py-4 text-left text-sm font-medium uppercase">Grade</th>
+                                <th class="px-3 md:px-6 py-3 md:py-4 text-left text-xs md:text-sm font-medium uppercase">SL</th>
+                                <th class="px-3 md:px-6 py-3 md:py-4 text-left text-xs md:text-sm font-medium uppercase">Subject</th>
+                                <th class="px-3 md:px-6 py-3 md:py-4 text-left text-xs md:text-sm font-medium uppercase">CQ</th>
+                                <th class="px-3 md:px-6 py-3 md:py-4 text-left text-xs md:text-sm font-medium uppercase">CA</th>
+                                <th class="px-3 md:px-6 py-3 md:py-4 text-left text-xs md:text-sm font-medium uppercase">P</th>
+                                <th class="px-3 md:px-6 py-3 md:py-4 text-left text-xs md:text-sm font-medium uppercase">Total</th>
+                                <th class="px-3 md:px-6 py-3 md:py-4 text-left text-xs md:text-sm font-medium uppercase">Grade</th>
                             </tr>
                         </thead>
                         <tbody id="marks-table-body" class="bg-white divide-y divide-gray-200">
                             ${classSubjects.map((sub, i) => `
                                 <tr data-subject-index="${i}" class="table-row">
-                                    <td class="px-6 py-4 whitespace-nowrap text-center">${i + 1}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap">${sub.name} (${sub.total})</td>
-                                    <td class="px-6 py-4"><input type="number" oninput="updateRow(${i})" class="w-20 py-2 px-3 border border-gray-300 rounded-md shadow-sm mark-input focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500" data-type="cq" data-max="${sub.cq}" ${sub.cq === 0 ? 'disabled' : ''} value="${studentData && studentData.marks[i] ? studentData.marks[i].cq : ''}" placeholder="0"></td>
-                                    <td class="px-6 py-4"><input type="number" oninput="updateRow(${i})" class="w-20 py-2 px-3 border border-gray-300 rounded-md shadow-sm mark-input focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500" data-type="ca" data-max="${sub.ca}" ${sub.ca === 0 ? 'disabled' : ''} value="${studentData && studentData.marks[i] ? studentData.marks[i].ca : ''}" placeholder="0"></td>
-                                    <td class="px-6 py-4"><input type="number" oninput="updateRow(${i})" class="w-20 py-2 px-3 border border-gray-300 rounded-md shadow-sm mark-input focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500" data-type="p" data-max="${sub.p}" ${sub.p === 0 ? 'disabled' : ''} value="${studentData && studentData.marks[i] ? studentData.marks[i].p : ''}" placeholder="0"></td>
-                                    <td class="px-6 py-4 font-bold total-mark text-center">-</td>
-                                    <td class="px-6 py-4 font-semibold grade text-center">-</td>
+                                    <td class="px-3 md:px-6 py-3 md:py-4 whitespace-nowrap text-center text-sm">${i + 1}</td>
+                                    <td class="px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm">${sub.name} (${sub.total})</td>
+                                    <td class="px-3 md:px-6 py-3 md:py-4"><input type="number" oninput="updateRow(${i})" class="w-14 md:w-20 py-2 px-2 md:px-3 border border-gray-300 rounded-md shadow-sm mark-input focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm" data-type="cq" data-max="${sub.cq}" ${sub.cq === 0 ? 'disabled' : ''} value="${studentData && studentData.marks[i] ? studentData.marks[i].cq : ''}" placeholder="0"></td>
+                                    <td class="px-3 md:px-6 py-3 md:py-4"><input type="number" oninput="updateRow(${i})" class="w-14 md:w-20 py-2 px-2 md:px-3 border border-gray-300 rounded-md shadow-sm mark-input focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm" data-type="ca" data-max="${sub.ca}" ${sub.ca === 0 ? 'disabled' : ''} value="${studentData && studentData.marks[i] ? studentData.marks[i].ca : ''}" placeholder="0"></td>
+                                    <td class="px-3 md:px-6 py-3 md:py-4"><input type="number" oninput="updateRow(${i})" class="w-14 md:w-20 py-2 px-2 md:px-3 border border-gray-300 rounded-md shadow-sm mark-input focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm" data-type="p" data-max="${sub.p}" ${sub.p === 0 ? 'disabled' : ''} value="${studentData && studentData.marks[i] ? studentData.marks[i].p : ''}" placeholder="0"></td>
+                                    <td class="px-3 md:px-6 py-3 md:py-4 font-bold total-mark text-center text-sm">-</td>
+                                    <td class="px-3 md:px-6 py-3 md:py-4 font-semibold grade text-center text-sm">-</td>
                                 </tr>
                             `).join('')}
                         </tbody>
                     </table>
                 </div>
-                <div class="mt-8 flex justify-end space-x-4">
-                     <button onclick="goHome()" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg transition flex items-center space-x-2">
+                <div class="mt-6 md:mt-8 flex flex-col sm:flex-row justify-end gap-3 md:gap-4">
+                     <button onclick="goHome()" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg transition flex items-center justify-center space-x-2 w-full sm:w-auto">
                         <i class="fas fa-home"></i>
                         <span>Go to Home</span>
                     </button>
-                    <button onclick="clearForm(${classNumber})" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-lg transition flex items-center space-x-2">
+                    <button onclick="clearForm(${classNumber})" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-lg transition flex items-center justify-center space-x-2 w-full sm:w-auto">
                         <i class="fas fa-redo"></i>
                         <span>Input Another</span>
                     </button>
-                    <button onclick="saveResult(${classNumber})" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg transition flex items-center space-x-2">
+                    <button onclick="saveResult(${classNumber})" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg transition flex items-center justify-center space-x-2 w-full sm:w-auto">
                         <i class="fas fa-save"></i>
                         <span>${studentData ? 'Update Result' : 'Save Result'}</span>
                     </button>
@@ -710,69 +775,69 @@
             }, 3000);
             
             const resultHTML = `
-                <div class="bg-white p-8 rounded-2xl shadow-xl" id="result-sheet">
-                    <div class="text-center mb-8">
+                <div class="bg-white p-4 md:p-8 rounded-2xl shadow-xl" id="result-sheet">
+                    <div class="text-center mb-6 md:mb-8">
                         <div class="inline-block p-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full mb-4">
                             <i class="fas fa-graduation-cap text-white text-2xl"></i>
                         </div>
-                        <h2 class="text-3xl font-bold text-gray-800">M.N.Academy Vocational Result</h2>
-                        <p class="text-gray-600">SSC Vocational Examination</p>
+                        <h2 class="text-2xl md:text-3xl font-bold text-gray-800">M.N.Academy Vocational Result</h2>
+                        <p class="text-sm md:text-base text-gray-600">SSC Vocational Examination</p>
                     </div>
                     
-                    <div class="mb-8 p-6 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl border border-blue-100">
-                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-                            <div class="p-4 bg-white rounded-lg shadow-sm">
-                                <p class="text-sm text-gray-500">Total Marks</p>
-                                <p class="text-2xl font-bold text-blue-600">${totalMarksObtained}</p>
+                    <div class="mb-6 md:mb-8 p-4 md:p-6 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl border border-blue-100">
+                        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 text-center">
+                            <div class="p-3 md:p-4 bg-white rounded-lg shadow-sm">
+                                <p class="text-xs md:text-sm text-gray-500">Total Marks</p>
+                                <p class="text-xl md:text-2xl font-bold text-blue-600">${totalMarksObtained}</p>
                             </div>
-                            <div class="p-4 bg-white rounded-lg shadow-sm">
-                                <p class="text-sm text-gray-500">Final GPA</p>
-                                <p class="text-2xl font-bold ${isFail ? 'text-red-500' : 'text-green-600'}">${isFail ? 'FAIL' : finalGPA}</p>
+                            <div class="p-3 md:p-4 bg-white rounded-lg shadow-sm">
+                                <p class="text-xs md:text-sm text-gray-500">Final GPA</p>
+                                <p class="text-xl md:text-2xl font-bold ${isFail ? 'text-red-500' : 'text-green-600'}">${isFail ? 'FAIL' : finalGPA}</p>
                             </div>
-                            <div class="p-4 bg-white rounded-lg shadow-sm">
-                                <p class="text-sm text-gray-500">Final Grade</p>
-                                <p class="text-2xl font-bold ${isFail ? 'text-red-500' : 'text-purple-600'}">${isFail ? 'F' : finalGrade}</p>
+                            <div class="p-3 md:p-4 bg-white rounded-lg shadow-sm">
+                                <p class="text-xs md:text-sm text-gray-500">Final Grade</p>
+                                <p class="text-xl md:text-2xl font-bold ${isFail ? 'text-red-500' : 'text-purple-600'}">${isFail ? 'F' : finalGrade}</p>
                             </div>
-                            <div class="p-4 bg-white rounded-lg shadow-sm">
-                                <p class="text-sm text-gray-500">Merit Position</p>
-                                <p class="text-2xl font-bold ${isFail ? 'text-gray-500' : 'text-indigo-600'}">${isFail ? 'N/A' : meritPosition}</p>
+                            <div class="p-3 md:p-4 bg-white rounded-lg shadow-sm">
+                                <p class="text-xs md:text-sm text-gray-500">Merit Position</p>
+                                <p class="text-xl md:text-2xl font-bold ${isFail ? 'text-gray-500' : 'text-indigo-600'}">${isFail ? 'N/A' : meritPosition}</p>
                             </div>
                         </div>
                     </div>
                     
-                    <div class="grid md:grid-cols-3 gap-4 mb-8">
-                        <div class="p-4 bg-gray-50 rounded-lg"><strong>Name:</strong> ${name}</div>
-                        <div class="p-4 bg-gray-50 rounded-lg"><strong>ID:</strong> ${id}</div>
-                        <div class="p-4 bg-gray-50 rounded-lg"><strong>Class:</strong> ${classNumber}</div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4 mb-6 md:mb-8">
+                        <div class="p-3 md:p-4 bg-gray-50 rounded-lg text-sm md:text-base"><strong>Name:</strong> ${name}</div>
+                        <div class="p-3 md:p-4 bg-gray-50 rounded-lg text-sm md:text-base"><strong>ID:</strong> ${id}</div>
+                        <div class="p-3 md:p-4 bg-gray-50 rounded-lg text-sm md:text-base"><strong>Class:</strong> ${classNumber}</div>
                     </div>
                     
-                    <div class="overflow-x-auto rounded-lg border border-gray-200">
-                         <table class="min-w-full divide-y divide-gray-200">
+                    <div class="table-wrapper rounded-lg border border-gray-200">
+                         <table class="min-w-full divide-y divide-gray-200 mobile-card-table">
                             <thead class="bg-gradient-to-r from-blue-500 to-purple-600 text-white">
                                 <tr>
-                                    <th class="px-6 py-4 text-left text-sm font-medium uppercase">Subject</th>
-                                    <th class="px-6 py-4 text-center text-sm font-medium uppercase">Total Mark</th>
-                                    <th class="px-6 py-4 text-center text-sm font-medium uppercase">Obtained Mark</th>
-                                    <th class="px-6 py-4 text-center text-sm font-medium uppercase">Grade</th>
-                                    <th class="px-6 py-4 text-center text-sm font-medium uppercase">GP</th>
+                                    <th class="px-3 md:px-6 py-3 md:py-4 text-left text-xs md:text-sm font-medium uppercase">Subject</th>
+                                    <th class="px-3 md:px-6 py-3 md:py-4 text-center text-xs md:text-sm font-medium uppercase">Total</th>
+                                    <th class="px-3 md:px-6 py-3 md:py-4 text-center text-xs md:text-sm font-medium uppercase">Obtained</th>
+                                    <th class="px-3 md:px-6 py-3 md:py-4 text-center text-xs md:text-sm font-medium uppercase">Grade</th>
+                                    <th class="px-3 md:px-6 py-3 md:py-4 text-center text-xs md:text-sm font-medium uppercase">GP</th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
                             ${classSubjects.map((sub, i) => `
                                 <tr class="table-row">
-                                    <td class="px-6 py-4">${sub.name}</td>
-                                    <td class="px-6 py-4 text-center">${sub.total}</td>
-                                    <td class="px-6 py-4 text-center">${processedMarks[i].total}</td>
-                                    <td class="px-6 py-4 text-center ${processedMarks[i].grade === 'F' ? 'text-red-500 font-bold' : processedMarks[i].grade === 'A+' ? 'text-green-600 font-bold' : ''}">${processedMarks[i].grade}</td>
-                                    <td class="px-6 py-4 text-center">${processedMarks[i].gp.toFixed(2)}</td>
+                                    <td class="px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm" data-label="Subject">${sub.name}</td>
+                                    <td class="px-3 md:px-6 py-3 md:py-4 text-center text-xs md:text-sm" data-label="Total">${sub.total}</td>
+                                    <td class="px-3 md:px-6 py-3 md:py-4 text-center text-xs md:text-sm" data-label="Obtained">${processedMarks[i].total}</td>
+                                    <td class="px-3 md:px-6 py-3 md:py-4 text-center text-xs md:text-sm ${processedMarks[i].grade === 'F' ? 'text-red-500 font-bold' : processedMarks[i].grade === 'A+' ? 'text-green-600 font-bold' : ''}" data-label="Grade">${processedMarks[i].grade}</td>
+                                    <td class="px-3 md:px-6 py-3 md:py-4 text-center text-xs md:text-sm" data-label="GP">${processedMarks[i].gp.toFixed(2)}</td>
                                 </tr>
                             `).join('')}
                             </tbody>
                         </table>
                     </div>
                     
-                    <div class="mt-8 text-center no-print">
-                         <button onclick="printResult('${name}', '${id}', '${classNumber}', ${totalMarksObtained}, '${finalGPA}', '${finalGrade}', '${meritPosition}')" class="btn-primary text-white font-bold py-3 px-6 rounded-lg transition flex items-center space-x-2 mx-auto">
+                    <div class="mt-6 md:mt-8 text-center no-print">
+                         <button onclick="printResult('${name}', '${id}', '${classNumber}', ${totalMarksObtained}, '${finalGPA}', '${finalGrade}', '${meritPosition}')" class="btn-primary text-white font-bold py-3 px-6 rounded-lg transition flex items-center space-x-2 mx-auto w-full sm:w-auto justify-center">
                             <i class="fas fa-print"></i>
                             <span>Print Result</span>
                          </button>
@@ -889,39 +954,41 @@
                      return;
                 }
                 const tableHTML = `
-                    <div class="flex justify-between items-center mb-6 no-print">
-                         <h3 class="text-xl font-semibold text-gray-800">All Records for Class ${classNumber}</h3>
-                         <div class="flex space-x-2">
-                            <button onclick="printAllResults(${classNumber})" class="bg-blue-500 text-white px-4 py-2 rounded-lg transition flex items-center space-x-2">
+                    <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6 no-print">
+                         <h3 class="text-lg md:text-xl font-semibold text-gray-800">All Records for Class ${classNumber}</h3>
+                         <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                            <button onclick="printAllResults(${classNumber})" class="bg-blue-500 text-white px-4 py-2 rounded-lg transition flex items-center justify-center space-x-2 w-full sm:w-auto">
                                 <i class="fas fa-print"></i>
                                 <span>Print All</span>
                             </button>
-                            <button onclick="downloadAllPDF(${classNumber})" class="bg-green-500 text-white px-4 py-2 rounded-lg transition flex items-center space-x-2">
+                            <button onclick="downloadAllPDF(${classNumber})" class="bg-green-500 text-white px-4 py-2 rounded-lg transition flex items-center justify-center space-x-2 w-full sm:w-auto">
                                 <i class="fas fa-download"></i>
                                 <span>Download PDF</span>
                             </button>
                          </div>
                     </div>
-                    <div class="overflow-x-auto rounded-lg border border-gray-200">
-                        <table class="min-w-full divide-y divide-gray-200" id="all-results-table">
+                    <div class="table-wrapper rounded-lg border border-gray-200">
+                        <table class="min-w-full divide-y divide-gray-200 mobile-card-table" id="all-results-table">
                              <thead class="bg-gradient-to-r from-blue-500 to-purple-600 text-white">
                                 <tr>
-                                    <th class="px-6 py-4 text-left text-sm font-medium uppercase">Student ID</th>
-                                    <th class="px-6 py-4 text-left text-sm font-medium uppercase">Student Name</th>
-                                    <th class="px-6 py-4 text-left text-sm font-medium uppercase">Total Marks</th>
-                                    <th class="px-6 py-4 text-left text-sm font-medium uppercase no-print">Actions</th>
+                                    <th class="px-3 md:px-6 py-3 md:py-4 text-left text-xs md:text-sm font-medium uppercase">Student ID</th>
+                                    <th class="px-3 md:px-6 py-3 md:py-4 text-left text-xs md:text-sm font-medium uppercase">Student Name</th>
+                                    <th class="px-3 md:px-6 py-3 md:py-4 text-left text-xs md:text-sm font-medium uppercase">Total Marks</th>
+                                    <th class="px-3 md:px-6 py-3 md:py-4 text-left text-xs md:text-sm font-medium uppercase no-print">Actions</th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
                                 ${allResultsData.map(res => `
                                     <tr id="row-${res.id}" class="table-row">
-                                        <td class="px-6 py-4">${res.id}</td>
-                                        <td class="px-6 py-4">${res.name}</td>
-                                        <td class="px-6 py-4 font-semibold">${res.totalMarks}</td>
-                                        <td class="px-6 py-4 no-print">
-                                            <button onclick="printStudentResultFromList('${res.class}', '${res.id}')" class="text-blue-600 hover:text-blue-900 mr-3 transition"><i class="fas fa-print mr-1"></i>Print</button>
-                                            <button onclick="editResult('${res.class}', '${res.id}')" class="text-indigo-600 hover:text-indigo-900 mr-3 transition"><i class="fas fa-edit mr-1"></i>Edit</button>
-                                            <button onclick="deleteResult('${res.class}', '${res.id}')" class="text-red-600 hover:text-red-900 transition"><i class="fas fa-trash-alt mr-1"></i>Delete</button>
+                                        <td class="px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm" data-label="Student ID">${res.id}</td>
+                                        <td class="px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm" data-label="Student Name">${res.name}</td>
+                                        <td class="px-3 md:px-6 py-3 md:py-4 font-semibold text-xs md:text-sm" data-label="Total Marks">${res.totalMarks}</td>
+                                        <td class="px-3 md:px-6 py-3 md:py-4 no-print" data-label="Actions">
+                                            <div class="flex flex-col sm:flex-row gap-2">
+                                                <button onclick="printStudentResultFromList('${res.class}', '${res.id}')" class="text-blue-600 hover:text-blue-900 transition text-xs md:text-sm"><i class="fas fa-print mr-1"></i>Print</button>
+                                                <button onclick="editResult('${res.class}', '${res.id}')" class="text-indigo-600 hover:text-indigo-900 transition text-xs md:text-sm"><i class="fas fa-edit mr-1"></i>Edit</button>
+                                                <button onclick="deleteResult('${res.class}', '${res.id}')" class="text-red-600 hover:text-red-900 transition text-xs md:text-sm"><i class="fas fa-trash-alt mr-1"></i>Delete</button>
+                                            </div>
                                         </td>
                                     </tr>
                                 `).join('')}
@@ -1138,4 +1205,5 @@
         };
     </script>
 </body>
+
 </html>
