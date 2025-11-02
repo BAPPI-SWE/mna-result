@@ -492,7 +492,7 @@
             const classSubjects = subjects[classNumber];
             let formHTML = `
                 <h2 class="text-xl md:text-2xl font-bold mb-4 md:mb-6 text-gray-800">Enter Marks for Class ${classNumber}</h2>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-6 mb-6 md:mb-8">
                     <div>
                         <label for="student-name" class="block text-sm font-medium text-gray-700 mb-2">Student Name</label>
                         <input type="text" id="student-name" class="w-full py-3 px-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" value="${studentData ? studentData.name : ''}" placeholder="Enter student name">
@@ -500,6 +500,13 @@
                     <div>
                         <label for="student-id" class="block text-sm font-medium text-gray-700 mb-2">Student ID</label>
                         <input type="text" id="student-id" class="w-full py-3 px-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" value="${studentData ? studentData.id : ''}" ${studentData ? 'readonly' : ''} placeholder="Enter student ID">
+                    </div>
+                    <div>
+                        <label for="student-Section" class="block text-sm font-medium text-gray-700 mb-2">Section</label>
+                        <select id="student-gender" class="w-full py-3 px-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <option value="General electrical works" ${studentData && studentData.gender === 'General electrical works' ? 'selected' : ''}>General electrical works</option>
+                            <option value="Apparel manufacturing basics" ${studentData && studentData.gender === 'Apparel manufacturing basics' ? 'selected' : ''}>Apparel manufacturing basics</option>
+                        </select>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Class</label>
@@ -536,9 +543,9 @@
                 </div>
                 <div class="mt-6 md:mt-8 flex flex-col sm:flex-row justify-end gap-3 md:gap-4">
                      <button onclick="goHome()" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg transition flex items-center justify-center space-x-2 w-full sm:w-auto">
-                        <i class="fas fa-home"></i>
-                        <span>Go to Home</span>
-                    </button>
+                         <i class="fas fa-home"></i>
+                         <span>Go to Home</span>
+                     </button>
                     <button onclick="clearForm(${classNumber})" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-lg transition flex items-center justify-center space-x-2 w-full sm:w-auto">
                         <i class="fas fa-redo"></i>
                         <span>Input Another</span>
@@ -603,6 +610,7 @@
         async function saveResult(classNumber) {
             const studentName = document.getElementById('student-name').value.trim();
             const studentId = document.getElementById('student-id').value.trim();
+            const studentGender = document.getElementById('student-gender').value; // Get gender
             if (!studentName || !studentId) {
                 alert('Please fill in Student Name and ID.');
                 return;
@@ -623,6 +631,7 @@
                 name: studentName,
                 id: studentId,
                 class: classNumber,
+                gender: studentGender, // Add gender to data
                 marks: marksData,
                 timestamp: firebase.firestore.FieldValue.serverTimestamp()
             };
@@ -699,7 +708,7 @@
         }
         
         function displayResult(studentData, allClassResults, displayAreaId) {
-            const { name, id, class: classNumber, marks } = studentData;
+            const { name, id, class: classNumber, marks, gender } = studentData;
             const classSubjects = subjects[classNumber];
             let totalMarksObtained = 0;
             let totalGPs = 0;
@@ -787,10 +796,11 @@
                         </div>
                     </div>
                     
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4 mb-6 md:mb-8">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-3 md:gap-4 mb-6 md:mb-8">
                         <div class="p-3 md:p-4 bg-gray-50 border border-gray-200 rounded-lg text-sm md:text-base"><strong>Name:</strong> ${name}</div>
                         <div class="p-3 md:p-4 bg-gray-50 border border-gray-200 rounded-lg text-sm md:text-base"><strong>ID:</strong> ${id}</div>
                         <div class="p-3 md:p-4 bg-gray-50 border border-gray-200 rounded-lg text-sm md:text-base"><strong>Class:</strong> ${classNumber}</div>
+                        <div class="p-3 md:p-4 bg-gray-50 border border-gray-200 rounded-lg text-sm md:text-base"><strong>Section:</strong> ${gender || 'N/A'}</div>
                     </div>
                     
                     <div class="table-wrapper rounded-lg border border-gray-200">
@@ -825,7 +835,7 @@
                     </div>
                     
                     <div class="mt-6 md:mt-8 text-center no-print">
-                         <button onclick="printResult('${name}', '${id}', '${classNumber}', ${totalMarksObtained}, '${finalGPA}', '${finalGrade}', '${meritPosition}')" class="btn-primary text-white font-bold py-3 px-6 rounded-lg transition flex items-center space-x-2 mx-auto w-full sm:w-auto justify-center">
+                         <button onclick="printResult('${name}', '${id}', '${classNumber}', '${gender || 'N/A'}', ${totalMarksObtained}, '${isFail ? 'FAIL' : finalGPA}', '${isFail ? 'F' : finalGrade}', '${isFail ? 'N/A' : meritPosition}')" class="btn-primary text-white font-bold py-3 px-6 rounded-lg transition flex items-center space-x-2 mx-auto w-full sm:w-auto justify-center">
                             <i class="fas fa-print"></i>
                             <span>Print Result</span>
                          </button>
@@ -856,7 +866,7 @@
             }
         }
         
-        function printResult(name, id, classNumber, totalMarks, gpa, grade, merit) {
+        function printResult(name, id, classNumber, gender, totalMarks, gpa, grade, merit) {
             const tableRows = document.querySelectorAll('#result-sheet tbody tr');
             let tableHTML = '';
             tableRows.forEach(row => {
@@ -884,6 +894,7 @@
                         <div style="font-size: 14px;"><strong>Name:</strong> ${name}</div>
                         <div style="font-size: 14px;"><strong>ID:</strong> ${id}</div>
                         <div style="font-size: 14px;"><strong>Class:</strong> ${classNumber}</div>
+                        <div style="font-size: 14px;"><strong>Section:</strong> ${gender}</div>
                     </div>
                     
                     <table style="width: 100%; border-collapse: collapse; margin-bottom: 18px; border: 2px solid #333;">
@@ -949,18 +960,26 @@
                      return;
                 }
                 const tableHTML = `
-                    <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6 no-print">
-                         <h3 class="text-lg md:text-xl font-semibold text-gray-800">All Records for Class ${classNumber}</h3>
-                         <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-                            <button onclick="printAllResults(${classNumber})" class="bg-blue-500 text-white px-4 py-2 rounded-lg transition flex items-center justify-center space-x-2 w-full sm:w-auto">
-                                <i class="fas fa-print"></i>
-                                <span>Print All</span>
-                            </button>
-                            <button onclick="downloadAllPDF(${classNumber})" class="bg-green-500 text-white px-4 py-2 rounded-lg transition flex items-center justify-center space-x-2 w-full sm:w-auto">
-                                <i class="fas fa-download"></i>
-                                <span>Download PDF</span>
-                            </button>
-                         </div>
+                    <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-6 no-print">
+                        <h3 class="text-lg md:text-xl font-semibold text-gray-800">Records for Class ${classNumber}</h3>
+                        
+                        <div class="flex flex-col md:flex-row gap-4 items-center">
+                            <div class="flex space-x-2 p-1 bg-gray-200 rounded-lg">
+                                <button id="filter-all" onclick="filterResults('all')" class="px-3 py-1 text-sm font-medium text-white bg-blue-500 rounded-md shadow">All</button>
+                                <button id="filter-General electrical works" onclick="filterResults('General electrical works')" class="px-3 py-1 text-sm font-medium text-gray-700 hover:bg-gray-300 rounded-md">General electrical works</button>
+                                <button id="filter-Apparel manufacturing basics" onclick="filterResults('Apparel manufacturing basics')" class="px-3 py-1 text-sm font-medium text-gray-700 hover:bg-gray-300 rounded-md">Apparel manufacturing basics</button>
+                            </div>
+                            <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                                <button onclick="printAllResults(${classNumber})" class="bg-blue-500 text-white px-4 py-2 rounded-lg transition flex items-center justify-center space-x-2 w-full sm:w-auto">
+                                    <i class="fas fa-print"></i>
+                                    <span>Print All</span>
+                                </button>
+                                <button onclick="downloadAllPDF(${classNumber})" class="bg-green-500 text-white px-4 py-2 rounded-lg transition flex items-center justify-center space-x-2 w-full sm:w-auto">
+                                    <i class="fas fa-download"></i>
+                                    <span>Download PDF</span>
+                                </button>
+                            </div>
+                        </div>
                     </div>
                     <div class="table-wrapper rounded-lg border border-gray-200">
                         <table class="min-w-full divide-y divide-gray-200 mobile-card-table" id="all-results-table">
@@ -974,7 +993,7 @@
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
                                 ${allResultsData.map(res => `
-                                    <tr id="row-${res.id}" class="table-row">
+                                    <tr id="row-${res.id}" class="table-row" data-gender="${res.gender || 'Unknown'}">
                                         <td class="px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm" data-label="Student ID">${res.id}</td>
                                         <td class="px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm" data-label="Student Name">${res.name}</td>
                                         <td class="px-3 md:px-6 py-3 md:py-4 font-semibold text-xs md:text-sm" data-label="Total Marks">${res.totalMarks}</td>
@@ -998,6 +1017,40 @@
             }
         }
         
+        function filterResults(genderFilter) {
+            const rows = document.querySelectorAll('#all-results-table tbody tr');
+            rows.forEach(row => {
+                if (genderFilter === 'all') {
+                    row.style.display = ''; // Show all
+                } else {
+                    if (row.dataset.gender === genderFilter) {
+                        row.style.display = ''; // Show matching
+                    } else {
+                        row.style.display = 'none'; // Hide non-matching
+                    }
+                }
+            });
+
+            // Update button styles
+            const buttons = {
+                'all': document.getElementById('filter-all'),
+                'General electrical works': document.getElementById('filter-General electrical works'),
+                'Apparel manufacturing basics': document.getElementById('filter-Apparel manufacturing basics')
+            };
+            
+            for (const [key, button] of Object.entries(buttons)) {
+                if (button) { // Check if button exists
+                    if (key === genderFilter) {
+                        button.classList.add('bg-blue-500', 'text-white', 'shadow');
+                        button.classList.remove('text-gray-700', 'hover:bg-gray-300');
+                    } else {
+                        button.classList.remove('bg-blue-500', 'text-white', 'shadow');
+                        button.classList.add('text-gray-700', 'hover:bg-gray-300');
+                    }
+                }
+            }
+        }
+
         async function editResult(classNumber, studentId) {
             const docRef = resultsCollection.doc(`${classNumber}_${studentId}`);
             const docSnap = await docRef.get();
@@ -1027,7 +1080,7 @@
                 const docSnap = await docRef.get();
                 if (docSnap.exists) {
                     const studentData = docSnap.data();
-                    const { name, id, class: cls, marks } = studentData;
+                    const { name, id, class: cls, marks, gender } = studentData;
                     const classSubjects = subjects[cls];
                     
                     let totalMarksObtained = 0;
@@ -1105,6 +1158,7 @@
                                 <div style="font-size: 14px;"><strong>Name:</strong> ${name}</div>
                                 <div style="font-size: 14px;"><strong>ID:</strong> ${id}</div>
                                 <div style="font-size: 14px;"><strong>Class:</strong> ${cls}</div>
+                                <div style="font-size: 14px;"><strong>Section:</strong> ${gender || 'N/A'}</div>
                             </div>
                             
                             <table style="width: 100%; border-collapse: collapse; margin-bottom: 18px; border: 2px solid #333;">
